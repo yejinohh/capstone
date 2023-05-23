@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<div layout:fragment="content">
+
+    <div class = "container">
+
+        <div>
+
+            <button class="btn btn-secondary" onclick="history.back()">돌아가기</button>
+
+            <form th:action="@{/board/delete}" method="POST" style="display: inline;">
+                <input type="hidden" name="boardId" th:value="${board.boardId}" />
+                <button type="submit" class="btn btn-primary">삭제</button>
+            </form>
+
+            <a th:href="@{'/modify/' + ${board.boardId}}" class="btn btn-primary">수정</a>
+
+
+
+        </div>
+
+        <br/>
+        <br/>
+
+        <div class="form-group">
+            <h3 th:text ="${board.title}"></h3>
+        </div>
+
+        <hr/>
+
+        <div class ="form group">
+            <div th:text ="${board.content}"></div>
+        </div>
+
+        <img th:src="${board.filepath}">
+
+    </div>
+
+</div>
+</html>

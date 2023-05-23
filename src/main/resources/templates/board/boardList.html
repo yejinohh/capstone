@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<!-- 사용자 스크립트 추가 -->
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+
+
+    </script>
+</th:block>
+
+<!-- 사용자 CSS 추가 -->
+<th:block layout:fragment="css">
+    <style>
+        select{
+            margin-right:10px;
+        }
+        display: inline;
+    </style>
+</th:block>
+
+<div layout:fragment="content">
+
+    <form th:action="@{'/board/list/' + ${boardId}}" role="form" method="get">
+        <table class = "table">
+            <thead>
+                <tr>
+                    <td>번호</td>
+                    <td>제목</td>
+                    <td>내용</td>
+                    <td>등록일</td>
+                </tr>
+            </thead>
+            <tbody>
+
+            <tr th:each = "board : ${list}" >
+                    <td th:text = "${board.boardId}"></td>
+                    <td>
+                        <a th:text = "${board.title}" th:href="'/board/view/' + ${board.boardId}"></a>
+                    </td>
+                    <td th:text = "${board.content}"></td>
+                    <td></td>
+                </tr>
+            </tbody>
+
+        </table>
+
+        <ul class="pagination justify-content-center">
+
+            <div th:if="${nowPage == startPage-1}">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled"><a class="page-link" th:href="@{/board/list(page=${nowPage-1})}">Previous</a></li>
+                </ul>
+            </div>
+            <div th:unless="${nowPage == startPage-1}">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item"><a class="page-link" th:href="@{/board/list(page=${nowPage-1})}">Previous</a></li>
+                </ul>
+            </div>
+
+
+
+            <div th:if="${nowPage == endPage-1}">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled"><a class="page-link" th:href="@{/board/list(page=${nowPage+1})}">Next</a></li>
+                </ul>
+            </div>
+
+            <div th:unless="${nowPage == endPage-1}">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item"><a class="page-link" th:href="@{/board/list(page=${nowPage+1})}">Next</a></li>
+                </ul>
+            </div>
+
+        </ul>
+    </form>
+
+</div>
+</html>
