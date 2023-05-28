@@ -2,8 +2,10 @@ package com.project.capstone.entity;
 
 import com.project.capstone.constant.Role;
 import com.project.capstone.dto.MemberDto;
+import jdk.jfr.Enabled;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.ansi.AnsiOutput;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;

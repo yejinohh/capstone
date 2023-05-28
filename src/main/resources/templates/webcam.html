@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+
+<th:block layout:fragment="css">
+    <style>
+        canvas {
+            position: absolute;
+        }
+
+        body{
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    </style>
+</th:block>
+
+
+<th:block layout:fragment="script">
+    <script defer src="/js/face-api.min.js"></script>
+    <script defer src="/js/script.js" type="module"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</th:block>
+
+
+<div layout:fragment="content">
+
+    <video id="videoElement" width="500" height="400" autoplay></video>
+    <div id="buttonContainer">
+        <button id="startButton" class="btn btn-secondary">Start Camera</button>
+        <button id="stopButton" class="btn btn-secondary">Stop Camera</button>
+    </div>
+
+</div>
+</html>

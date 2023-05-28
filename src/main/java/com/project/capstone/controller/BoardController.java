@@ -42,7 +42,7 @@ public class BoardController {
     private BoardService boardService;
     private MemberService memberService;
 
-     //등록 초기 화면
+    //등록 초기 화면
     @GetMapping("/upload/new")
     public String boardForm(Model model){
         model.addAttribute("boardDto", new BoardDto());
@@ -59,8 +59,8 @@ public class BoardController {
         }
 
         if(file.isEmpty()){
-          model.addAttribute("errorMessage", "사진은 필수 입력 값입니다");
-          return "board/boardForm";
+            model.addAttribute("errorMessage", "사진은 필수 입력 값입니다");
+            return "board/boardForm";
         }
 
         try {
@@ -74,7 +74,7 @@ public class BoardController {
             return "board/boardForm";
         }
 
-        return "/board/boardList";
+        return "board/boardList";
     }
 
     //게시글 목록
@@ -96,7 +96,7 @@ public class BoardController {
 
         //System.out.println(nowPage + ". " + startPage + ",  " + endPage);
 
-        return"/board/boardList";
+        return"board/boardList";
 
     }
 
@@ -138,7 +138,7 @@ public class BoardController {
             return "board/boardForm";
         }
 
-        return "/index";
+        return "index";
     }
 
     // 게시글 상세보기

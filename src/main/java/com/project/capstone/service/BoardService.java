@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -70,5 +71,9 @@ public class BoardService {
 
     public void boardDelete(Integer id){
         boardRepository.deleteById(id);
+    }
+
+    public List<Board> findAll(){
+        return boardRepository.findAll();
     }
 }

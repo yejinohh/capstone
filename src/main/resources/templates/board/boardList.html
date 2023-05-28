@@ -26,23 +26,23 @@
     <form th:action="@{'/board/list/' + ${boardId}}" role="form" method="get">
         <table class = "table">
             <thead>
-                <tr>
-                    <td>번호</td>
-                    <td>제목</td>
-                    <td>내용</td>
-                    <td>등록일</td>
-                </tr>
+            <tr>
+                <td>번호</td>
+                <td>제목</td>
+                <td>내용</td>
+                <td>등록일</td>
+            </tr>
             </thead>
             <tbody>
 
             <tr th:each = "board : ${list}" >
-                    <td th:text = "${board.boardId}"></td>
-                    <td>
-                        <a th:text = "${board.title}" th:href="'/board/view/' + ${board.boardId}"></a>
-                    </td>
-                    <td th:text = "${board.content}"></td>
-                    <td></td>
-                </tr>
+                <td th:text = "${board.boardId}"></td>
+                <td>
+                    <a th:text = "${board.title}" th:href="'/board/view/' + ${board.boardId}"></a>
+                </td>
+                <td th:text = "${board.content}"></td>
+                <td></td>
+            </tr>
             </tbody>
 
         </table>
