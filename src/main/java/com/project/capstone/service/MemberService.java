@@ -4,18 +4,12 @@ package com.project.capstone.service;
 import com.project.capstone.entity.Member;
 import com.project.capstone.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -58,6 +52,15 @@ public class MemberService implements UserDetailsService {
 
         return member;
 
+    }
+
+    @Transactional(readOnly = true)
+    public Member searchMember(String memberName){;
+        Member member = memberRepository.findByName(memberName);
+        if(member==null){
+            member = new Member();
+        }
+        return member;
     }
 
 }

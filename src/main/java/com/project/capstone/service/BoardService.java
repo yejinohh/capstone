@@ -25,7 +25,6 @@ import java.util.UUID;
 
 
 @Service
-@Component
 @Transactional
 @RequiredArgsConstructor
 public class BoardService {

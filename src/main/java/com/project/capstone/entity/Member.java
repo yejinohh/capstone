@@ -3,6 +3,7 @@ package com.project.capstone.entity;
 import com.project.capstone.constant.Role;
 import com.project.capstone.dto.MemberDto;
 import jdk.jfr.Enabled;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.ansi.AnsiOutput;
@@ -13,9 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import javax.persistence.*;
 import java.util.Collection;
 
-@Entity
-@Setter
-@Getter
+@Entity @Setter @Getter
 public class Member implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +29,7 @@ public class Member implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+
     public static Member toMemberEntity(MemberDto memberDto, PasswordEncoder passwordEncoder){
         Member memberEntity = new Member();
         memberEntity.setEmail(memberDto.getEmail());
@@ -39,6 +39,7 @@ public class Member implements UserDetails {
         memberEntity.setRole(Role.USER);
         return memberEntity;
     }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
