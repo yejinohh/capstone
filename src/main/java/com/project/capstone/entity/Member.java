@@ -29,6 +29,7 @@ public class Member implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    private String token;
 
     public static Member toMemberEntity(MemberDto memberDto, PasswordEncoder passwordEncoder){
         Member memberEntity = new Member();

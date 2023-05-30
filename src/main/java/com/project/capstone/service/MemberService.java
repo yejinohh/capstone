@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -24,6 +26,15 @@ public class MemberService implements UserDetailsService {
         //repository의 save메서드 호출(조건: entity객체를 넘겨줘야함)
         validateDuplicateMember(member);
         memberRepository.save(member);
+    }
+
+    public void updateMemberToken(String email, String accessToken) {
+        Optional<Member> optionalMember = memberRepository.findByEmail_(email);
+        if (optionalMember.isPresent()) {
+            Member member = optionalMember.get();
+            member.setToken(accessToken);
+            memberRepository.save(member); // token 필드만 업데이트하여 저장
+        }
     }
 
     //중복된 email

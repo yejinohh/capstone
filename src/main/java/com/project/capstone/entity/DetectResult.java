@@ -6,14 +6,15 @@ import lombok.Setter;
 
 import javax.persistence.Entity;
 import java.time.LocalDate;
+import java.util.Date;
 
 @Getter
 @Setter
 public class DetectResult {
 
     String name;
-    double similarity;
+    int similarity;
     String emotion;
-    LocalDate currentTime;
+    String currentTime;
 
 }

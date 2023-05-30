@@ -13,6 +13,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -32,6 +33,8 @@ public class BoardDto {
     private String filepath;
 
     private Member member;
+
+    private Date uploadDate;
 
     //엔티티 자체를 반환 할 수 있지만 그럴때는 엔티티 클래스에 화면에서만 사용하는 값이 추가됨.
     //상픔 등록: 화면으로 전달받은 DTO객체를 Entity객체로 변환

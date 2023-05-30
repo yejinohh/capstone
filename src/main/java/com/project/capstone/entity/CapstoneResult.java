@@ -9,6 +9,5 @@ import java.util.List;
 public class CapstoneResult {
     boolean status;
     String message;
-    int count = 0;
-    List<DetectResult> data;
+    DetectResult detectResult;
 }

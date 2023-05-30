@@ -1,31 +1,35 @@
 package com.project.capstone.controller;
 
-import com.project.capstone.entity.Board;
-import com.project.capstone.entity.CapstoneResult;
-import com.project.capstone.entity.DetectResult;
-import com.project.capstone.entity.Member;
+import com.project.capstone.entity.*;
 import com.project.capstone.service.BoardService;
+import net.minidev.json.JSONObject;
+import org.aspectj.bridge.MessageUtil;
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.time.LocalDate;
+import java.text.SimpleDateFormat;
 import java.util.*;
-
 @Controller
 public class WebcamController {
 
     @Autowired
     private BoardService boardService;
-    ClassPathResource classPathResource;
+    private OAuthToken oAuthToken;
+    private MessageUtil logger;
+
 
     @GetMapping("/webcam")
     public String webcam() {
@@ -44,7 +48,6 @@ public class WebcamController {
             byte[] decodedImage = Base64.getDecoder().decode(imageData);
 
             String emotion = (String) map.get("emotion");
-            System.out.println("Emotion: " + emotion);
 
             String projectPath = "C:\\IdeaProjects\\capstone\\src\\main\\resources\\static\\capture"; //저장 경로 지정
             UUID uuid = UUID.randomUUID(); //식별자
@@ -57,7 +60,7 @@ public class WebcamController {
                 CapstoneResult capstoneResult = new CapstoneResult();
                 capstoneResult.setStatus(false);
                 capstoneResult.setMessage("memberID: " + member.getId());
-                capstoneResult.setData(null);
+                capstoneResult.setDetectResult(null);
                 return capstoneResult;
             }
 
@@ -73,11 +76,10 @@ public class WebcamController {
             }
 
             String repositoryFilepath = "C:\\IdeaProjects\\capstone\\src\\main\\resources\\static\\files\\";
-            List<DetectResult> detectResultList = new ArrayList<>();
+            DetectResult detectResult= new DetectResult();
 
             for(int i = 0; i < listFilename.size(); i++){
                 System.out.println(listFilename.get(i));
-
                 String filename1 = captureFilename;
                 String filename2 = repositoryFilepath + listFilename.get(i);
 
@@ -85,34 +87,51 @@ public class WebcamController {
 
 
                 if(similarity > 0.8){
-                    DetectResult detectResult = new DetectResult();
-                    detectResult.setName("ddd");
-                    detectResult.setSimilarity(similarity);
-                    detectResult.setEmotion(emotion);
-                    detectResult.setCurrentTime(LocalDate.now());
-                    detectResultList.add(detectResult);
-                    System.out.println("0.8 이상일 경우 출력: " + similarity);
+                    //System.out.println(listFilename.get(i));
+                    //날짜
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String stringDate = simpleDateFormat.format(new Date());
+                    //유사도
+                    int similarityPercentage = (int) (similarity * 100);
+                    //감정
+                    Map<String, String> labelMapping = new HashMap<>();
+                    labelMapping.put("angry", "화남");
+                    labelMapping.put("disgusted", "역겨움");
+                    labelMapping.put("fearful", "불안");
+                    labelMapping.put("happy", "기쁨");
+                    labelMapping.put("neutral", "중립");
+                    labelMapping.put("sad", "슬픔");
+                    labelMapping.put("surprised", "놀람");
+
+                    detectResult.setName(board.get(i).getTitle());
+                    detectResult.setSimilarity(similarityPercentage);
+                    detectResult.setEmotion(labelMapping.get(emotion));
+                    detectResult.setCurrentTime(stringDate);
                 }
             }
-
+            
             CapstoneResult capstoneResult = new CapstoneResult();
 
-            if(detectResultList.size() >= 1) {
+            if(detectResult.getName() != null) {
                 capstoneResult.setStatus(true);
-                capstoneResult.setCount(detectResultList.size());
                 capstoneResult.setMessage("Success");
-                capstoneResult.setData(detectResultList);
+                capstoneResult.setDetectResult(detectResult);
+                //카카오메시지
+                sendKakaoMessage(capstoneResult.getDetectResult(), member);
+
             } else {
-                capstoneResult.setStatus(true);
-                capstoneResult.setData(detectResultList);
+                capstoneResult.setStatus(false);
+                capstoneResult.setDetectResult(null);
+                System.out.println("사람이 탐지 되었지만 발견인물은 없음");
             }
+
             return capstoneResult;
 
         } catch (Exception e) {
             CapstoneResult capstoneResult = new CapstoneResult();
             capstoneResult.setStatus(false);
             capstoneResult.setMessage(e.toString());
-            capstoneResult.setData(null);
+            capstoneResult.setDetectResult(null);
             return capstoneResult;
         }
     }
@@ -138,5 +157,61 @@ public class WebcamController {
 
     }
 
+    protected void sendKakaoMessage(DetectResult detectResult, @AuthenticationPrincipal Member member){
+
+        String text = "⚠\uFE0F등록인물이 탐지 되었습니다.⚠\uFE0F\r\n" +
+                "✔\uFE0F발견 인물 : " +  detectResult.getName() + "\n" +
+                "✔\uFE0F유사도 : " + detectResult.getSimilarity() + "% \n" +
+                "✔\uFE0F발견 시간: " + detectResult.getCurrentTime() + "\n" +
+                "✔\uFE0F감정 예측: " + detectResult.getEmotion() + "\n" ;
+
+        RestTemplate rt = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization","Bearer " + member.getToken());
+        headers.add("Content-type", "application/x-www-form-urlencoded");
+
+        JSONObject templateObject = new JSONObject();
+        templateObject.put("object_type", "text");
+        templateObject.put("text", text);
+
+        JSONObject linkObject = new JSONObject();
+        linkObject.put("web_url", "https://localhost:8080.com");
+        linkObject.put("mobile_web_url", "https://localhost:8080.com");
+
+
+        templateObject.put("link", linkObject);
+        templateObject.put("button_title", "바로 확인");
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("template_object", templateObject.toString());
+
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers);
+
+        ResponseEntity<String> responseEntity = null;
+        try {
+            responseEntity = rt.exchange(
+                    "https://kapi.kakao.com/v2/api/talk/memo/default/send",
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class
+            );
+        } catch (Exception e) {
+            // 예외 발생 시 예외 메시지 출력 또는 로깅
+            e.printStackTrace();
+        }
+
+        if (responseEntity != null) {
+            int statusCode = responseEntity.getStatusCodeValue();
+            System.out.println("응답 상태 코드: " + statusCode);
+
+            String responseBody = responseEntity.getBody().toString();
+            System.out.println("응답 본문: " + responseBody);
+        } else {
+            System.out.println("응답이 없습니다.");
+        }
+
+    }
 
 }

@@ -7,6 +7,7 @@ import com.project.capstone.dto.MemberDto;
 import com.project.capstone.entity.KakaoProfile;
 import com.project.capstone.entity.Member;
 import com.project.capstone.entity.OAuthToken;
+import com.project.capstone.repository.MemberRepository;
 import com.project.capstone.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -33,6 +34,7 @@ public class MemberController {
 
     //생성자 주입
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private String cosKey = "cos1234";
@@ -132,9 +134,8 @@ public class MemberController {
                 String.class
         );
 
-        ObjectMapper objectMapper2  = new ObjectMapper();
-        KakaoProfile kakaoProfile = null;
 
+        KakaoProfile kakaoProfile = null;
         try{
             kakaoProfile = objectMapper.readValue(kakaoProfileResponse.getBody(), KakaoProfile.class);
         }catch (JsonMappingException e){
@@ -143,20 +144,17 @@ public class MemberController {
             e.printStackTrace();;
         }
 
-        //System.out.println("카카오 아이디: " + kakaoProfile.getId());
-        //System.out.println("카카오 이메일: " + kakaoProfile.getKakao_account().getEmail());
-        //Member 오브젝터 : username, password, email
-        System.out.println("우박이오 유저네임: " + kakaoProfile.getKakao_account().getEmail()+"_"+kakaoProfile.getId());
-        System.out.println("우박이오 이메일: " + kakaoProfile.getKakao_account().getEmail());
-        System.out.println("우박이오 패스워드: " + cosKey);
+        //System.out.println("우박이오 유저네임: " + kakaoProfile.getKakao_account().getEmail()+"_"+kakaoProfile.getId());
+        //System.out.println("우박이오 이메일: " + kakaoProfile.getKakao_account().getEmail());
+        //System.out.println("우박이오 패스워드: " + cosKey);
 
 
         //맴버 객체 생성
         MemberDto memberDto = new MemberDto();
+
         memberDto.setEmail(kakaoProfile.getKakao_account().getEmail());
         memberDto.setPassword(cosKey);
         memberDto.setName(kakaoProfile.getKakao_account().getEmail()+"_"+kakaoProfile.getId());
-
         Member kakaoMember = Member.toMemberEntity(memberDto, passwordEncoder);
 
         //가입자 혹은 비가입자 체크해서 처리
@@ -170,11 +168,15 @@ public class MemberController {
         //로그인 처리
         System.out.println("로그인 되었습니다.");
         String status;
+        kakaoMember.setToken(oauthToken.getAccess_token());
+        memberService.updateMemberToken(kakaoMember.getEmail(), oauthToken.getAccess_token());
+        //System.out.println("받은 토큰: " + oauthToken.getAccess_token());
+        //System.out.println("카카오 멤버 토큰: " + kakaoMember.getToken());
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(kakaoMember.getEmail(), cosKey);
-        System.out.println(kakaoMember.getName());
-        System.out.println(kakaoMember.getPassword());
 
+        //System.out.println(kakaoMember.getName());
+        //System.out.println(kakaoMember.getToken());
 
         try {
             // AuthenticationManager 에 token 을 넘기면 UserDetailsService 가 받아 처리하도록 한다.

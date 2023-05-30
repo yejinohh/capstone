@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Getter
@@ -24,6 +25,9 @@ public class Board {
     private String filename;
 
     private String filepath;
+
+    @JoinColumn(name = "upload_date")
+    private Date uploadDate;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")

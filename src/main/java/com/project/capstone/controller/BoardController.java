@@ -8,12 +8,9 @@ import com.project.capstone.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.querydsl.QSort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -24,14 +21,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.thymeleaf.model.IModel;
-
 import javax.persistence.EntityNotFoundException;
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.Optional;
 
 @Controller
 @Log
@@ -54,6 +46,7 @@ public class BoardController {
     public String boardNew(@Valid BoardDto boardDto, BindingResult bindingResult, Model model, MultipartFile file,
                            @AuthenticationPrincipal Member member)throws Exception {
 
+
         if (bindingResult.hasErrors()) {
             return "board/boardForm";
         }
@@ -64,8 +57,6 @@ public class BoardController {
         }
 
         try {
-            System.out.println("Name: " + member.getName() + "  Password: " + member.getPassword() + "  Role: " + member.getRole() + "   Id: " + member.getId());
-            System.out.println(boardDto);
             boardService.saveBoard(boardDto, member, file);
             model.addAttribute("message","글 작성이 완료되었습니다");
 
@@ -74,7 +65,7 @@ public class BoardController {
             return "board/boardForm";
         }
 
-        return "board/boardList";
+        return "redirect:/board/list";
     }
 
     //게시글 목록

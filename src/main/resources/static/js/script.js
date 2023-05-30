@@ -93,6 +93,7 @@ Promise.all([
 
             const face = detections[0];
             const expressions = face.expressions;
+            console.log(expressions)
             const maxExpression = Object.keys(expressions).reduce((a, b) => expressions[a] > expressions[b] ? a : b);
             //console.log('Emotions:', maxExpression, expressions[maxExpression]);
             console.log(face);

@@ -20,6 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,19 +37,22 @@ public class BoardService {
     public Integer saveBoard(BoardDto boardDto, Member member, MultipartFile file) throws Exception{
 
         Board board = boardDto.createBoard();
+        //멤버
         board.setMember(member);
 
         String projectPath = "C:\\IdeaProjects\\capstone\\src\\main\\resources\\static\\files"; //저장 경로 지정
         UUID uuid = UUID.randomUUID(); //식별자
         String fileName = uuid + "_" + file.getOriginalFilename(); //저장될 파일이름 = 식별자+파일이름
-        System.out.println(fileName);
+        //System.out.println(fileName);
         File saveFile = new File(projectPath, fileName);
         file.transferTo(saveFile);
-
+        //파일 이름 및 경로
         board.setFilename(fileName);
         board.setFilepath("/files/" + fileName); //서버에서 접근할 때는 static 아래 경로로만으로도 가능
+        //업로드 날짜
+        board.setUploadDate(new Date());
+        //저장
         boardRepository.save(board);
-
 
         return board.getBoardId();
     }

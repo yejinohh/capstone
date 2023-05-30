@@ -17,6 +17,10 @@
         select{
             margin-right:10px;
         }
+
+        table {
+            text-align: center;
+        }
         display: inline;
     </style>
 </th:block>
@@ -41,10 +45,9 @@
                     <a th:text = "${board.title}" th:href="'/board/view/' + ${board.boardId}"></a>
                 </td>
                 <td th:text = "${board.content}"></td>
-                <td></td>
+                <td th:text="${#dates.format(board.uploadDate, 'yyyy-MM-dd')}"></td>
             </tr>
             </tbody>
-
         </table>
 
         <ul class="pagination justify-content-center">
