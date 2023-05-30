@@ -109,7 +109,7 @@ public class WebcamController {
                     detectResult.setCurrentTime(stringDate);
                 }
             }
-            
+
             CapstoneResult capstoneResult = new CapstoneResult();
 
             if(detectResult.getName() != null) {
